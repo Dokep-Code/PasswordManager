@@ -1,0 +1,924 @@
+/* ---------- Theme ----------
+   Dark is the default. <html data-theme="light"> switches to the light palette.
+   The attribute is set by the inline script in index.html (before first paint)
+   and then by ThemeToggle.jsx. */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #10151f;
+  --surface: #171e2b;
+  --field: #0d121b;
+  --raised: #1f2738;
+  --line: #273145;
+  --line-strong: #3a4660;
+  --text: #e4e8f0;
+  --muted: #8a94a8;
+  --brass: #e2b35c; /* accent fill */
+  --brass-ink: #1d1505; /* text on top of --brass */
+  --brass-text: #e9c27a; /* accent used as text */
+  --danger: #f2877a;
+  --danger-ink: #2a0905;
+  --success: #5fcf8f;
+  --success-ink: #062712;
+  --hover: rgb(255 255 255 / 0.045);
+  --card-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 12px 32px -16px rgb(0 0 0 / 0.6);
+  --backdrop: rgb(6 9 15 / 0.6); /* behind the dialog */
+
+  --font: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', 'Cascadia Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  --card-pad: 22px;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  --bg: #e9edf3;
+  --surface: #ffffff;
+  --field: #f5f7fa;
+  --raised: #eef1f6;
+  --line: #d7dde6;
+  --line-strong: #b9c2cf;
+  --text: #141a24;
+  --muted: #586374;
+  --brass: #d19a38;
+  --brass-ink: #1d1505;
+  --brass-text: #8a5d10;
+  --danger: #c0392b;
+  --danger-ink: #ffffff;
+  --success: #1a7d48;
+  --success-ink: #ffffff;
+  --hover: rgb(20 26 36 / 0.04);
+  --card-shadow: 0 1px 2px rgb(20 26 36 / 0.06), 0 10px 28px -16px rgb(20 26 36 / 0.18);
+  --backdrop: rgb(20 26 36 / 0.3);
+}
+
+/* ---------- Base ---------- */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--brass) 35%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+}
+
+h1,
+h2 {
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* ---------- Topbar ---------- */
+
+/* Stays at the top while the page scrolls; the content shows faintly through it. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Same width and side padding as .app, so the bar lines up with the cards below. */
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 960px;
+  height: 60px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: auto;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.logo {
+  flex: none;
+}
+
+.logo rect {
+  fill: var(--brass);
+}
+
+.logo path {
+  fill: var(--bg);
+}
+
+/* Theme switch and account button share one quiet outlined look. */
+.theme-toggle,
+.user-trigger {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  height: 38px;
+  color: var(--muted);
+  background: transparent;
+  border-color: var(--line);
+  border-radius: 999px;
+}
+
+.theme-toggle {
+  justify-content: center;
+  width: 38px;
+  padding: 0;
+}
+
+.theme-toggle:hover {
+  color: var(--brass-text);
+  background: var(--hover);
+}
+
+/* ---------- Account menu ---------- */
+
+.user-menu {
+  position: relative;
+}
+
+.user-trigger {
+  gap: 8px;
+  padding: 0 10px 0 4px;
+  color: var(--text);
+}
+
+.user-trigger:hover,
+.user-trigger[aria-expanded='true'] {
+  background: var(--hover);
+  border-color: var(--line-strong);
+}
+
+.user-trigger svg {
+  color: var(--muted);
+  transition: rotate 0.15s ease;
+}
+
+.user-trigger[aria-expanded='true'] svg {
+  rotate: 180deg;
+}
+
+.user-name {
+  max-width: 14ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Round badge with the first letter of the user name */
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--brass-ink);
+  background: var(--brass);
+}
+
+.avatar.large {
+  width: 38px;
+  height: 38px;
+  font-size: 1rem;
+}
+
+.user-menu-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  box-shadow: 0 18px 40px -12px rgb(0 0 0 / 0.45);
+  animation: menu-in 0.15s ease-out;
+}
+
+.user-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px 12px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.user-menu-header > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.user-menu-header strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+  white-space: nowrap;
+  background: transparent;
+  border-color: transparent;
+}
+
+.menu-item svg {
+  color: var(--muted);
+}
+
+.menu-item:hover {
+  background: var(--hover);
+  border-color: transparent;
+}
+
+.menu-item:hover svg {
+  color: var(--brass-text);
+}
+
+.menu-item.danger:hover {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+
+.menu-item.danger:hover svg {
+  color: inherit;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    translate: 0 -4px;
+  }
+}
+
+/* ---------- Dialog (change master password) ---------- */
+
+/* showModal() puts the dialog above everything else and centres it. */
+.dialog {
+  width: min(420px, calc(100vw - 28px));
+  padding: 0;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px -16px rgb(0 0 0 / 0.55);
+}
+
+.dialog[open] {
+  animation: dialog-in 0.18s ease-out;
+}
+
+.dialog::backdrop {
+  background: var(--backdrop);
+  backdrop-filter: blur(3px);
+}
+
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+.dialog-body > * {
+  margin: 0;
+}
+
+.dialog-body h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.dialog-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+}
+
+.dialog-success svg {
+  flex: none;
+  box-sizing: content-box;
+  padding: 6px;
+  border-radius: 50%;
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 14%, transparent);
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    scale: 0.97;
+  }
+}
+
+/* ---------- Controls ---------- */
+
+input {
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: var(--text);
+  background: var(--field);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+
+input::placeholder {
+  color: var(--muted);
+  opacity: 0.75;
+}
+
+input:hover {
+  border-color: var(--line-strong);
+}
+
+input:focus,
+input:focus-visible {
+  outline: none;
+  border-color: var(--brass);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brass) 25%, transparent);
+}
+
+button {
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: color-mix(in srgb, var(--raised), var(--text) 7%);
+  border-color: var(--line-strong);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button[type='submit'] {
+  padding-inline: 18px;
+  font-weight: 600;
+  color: var(--brass-ink);
+  background: var(--brass);
+  border-color: transparent;
+}
+
+button[type='submit']:hover {
+  background: color-mix(in srgb, var(--brass), white 14%);
+  border-color: transparent;
+}
+
+button:disabled,
+button:disabled:hover {
+  cursor: progress;
+  opacity: 0.65;
+  transform: none;
+}
+
+/* ---------- Cards ---------- */
+
+.entry-form,
+.auth-card,
+section {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px var(--card-pad);
+  margin-bottom: 20px;
+  box-shadow: var(--card-shadow);
+}
+
+/* ---------- Add / edit form ---------- */
+
+/* Site and username side by side; everything else spans the full width. */
+.entry-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.entry-form > * {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.entry-form > label:nth-of-type(1),
+.entry-form > label:nth-of-type(2) {
+  grid-column: auto;
+}
+
+.entry-form.editing {
+  border-color: color-mix(in srgb, var(--brass) 60%, var(--line));
+}
+
+.entry-form label,
+.auth-card label,
+.dialog label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.password-row {
+  display: flex;
+  gap: 8px;
+}
+
+.password-row input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--mono);
+  font-size: 0.875rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.error {
+  color: var(--danger);
+  font-size: 0.875rem;
+}
+
+/* ---------- Login / create account ---------- */
+
+.auth-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 400px;
+  margin: 40px auto 0;
+  padding: 28px;
+}
+
+.auth-card > p {
+  margin: 0;
+}
+
+.auth-heading h2 {
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.auth-card button[type='submit'] {
+  padding-block: 11px;
+  font-size: 0.9375rem;
+}
+
+/* Neutral note with a brass icon (a brass-tinted box turned muddy brown on the dark theme) */
+.auth-info {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.auth-info svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--brass-text);
+}
+
+.auth-info strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.auth-switch {
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* A button that looks like a text link */
+.link-button,
+.link-button:hover {
+  padding: 0;
+  font-weight: 600;
+  color: var(--brass-text);
+  background: none;
+  border: none;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Saved passwords ---------- */
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.list-header input {
+  width: min(100%, 260px);
+}
+
+/* The table runs edge to edge inside the card, so row highlights reach the card border. */
+.table-wrap {
+  overflow-x: auto;
+  margin-inline: calc(-1 * var(--card-pad));
+}
+
+.entry-list {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.entry-list th,
+.entry-list td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.entry-list th:first-child,
+.entry-list td:first-child {
+  padding-left: var(--card-pad);
+}
+
+.entry-list th:last-child,
+.entry-list td:last-child {
+  padding-right: var(--card-pad);
+}
+
+.entry-list th {
+  padding-block: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.entry-list tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.entry-list tbody tr:hover {
+  background: var(--hover);
+}
+
+.entry-list td:first-child {
+  font-weight: 600;
+}
+
+.entry-list td:nth-child(2) {
+  color: var(--muted);
+}
+
+.entry-list tr.editing {
+  background: color-mix(in srgb, var(--brass) 7%, transparent);
+}
+
+.entry-list tr.editing td:first-child {
+  color: var(--brass-text);
+  box-shadow: inset 3px 0 0 var(--brass);
+}
+
+.password-cell {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.entry-list .actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* Square icon buttons. The text label stays in the button for screen readers
+   (and is shown on phones, see the narrow-screen section). */
+.actions button {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-left: 2px;
+  padding: 0;
+  vertical-align: middle;
+  color: var(--muted);
+  background: transparent;
+  border-color: transparent;
+}
+
+.btn-icon {
+  display: inline-grid;
+}
+
+.actions button:hover {
+  color: var(--text);
+  background: var(--hover);
+  border-color: var(--line);
+}
+
+.actions button.danger:hover,
+.actions button.failed,
+.actions button.failed:hover {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 35%, transparent);
+}
+
+/* Copy feedback: the button turns green, the icon pops, and a bubble says "Copied!" */
+.actions button.copied,
+.actions button.copied:hover {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  border-color: color-mix(in srgb, var(--success) 40%, transparent);
+}
+
+.actions button.copied .btn-icon,
+.actions button.failed .btn-icon {
+  animation: icon-pop 0.3s ease-out;
+}
+
+.actions button[data-feedback]::after {
+  content: attr(data-feedback);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  translate: -50% 0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  color: var(--success-ink);
+  background: var(--success);
+  animation: bubble-in 0.2s ease-out;
+}
+
+.actions button.failed[data-feedback]::after {
+  color: var(--danger-ink);
+  background: var(--danger);
+}
+
+@keyframes icon-pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    translate: -50% 4px;
+  }
+}
+
+/* Visually hidden, still read by screen readers */
+.sr-only,
+.actions .btn-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.empty,
+.note {
+  color: var(--muted);
+}
+
+.empty {
+  margin: 0;
+  padding: 28px 0 12px;
+  text-align: center;
+}
+
+.note {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+/* ---------- Narrow screens ---------- */
+
+@media (max-width: 600px) {
+  :root {
+    --card-pad: 16px;
+  }
+
+  .app {
+    padding: 20px 14px 36px;
+  }
+
+  .topbar-inner {
+    height: 56px;
+    padding: 0 14px;
+  }
+
+  .entry-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-card {
+    margin-top: 12px;
+    padding: 22px var(--card-pad);
+  }
+}
+
+/* Phones: the account button shrinks to the avatar; the name is in the open menu. */
+@media (max-width: 520px) {
+  .user-trigger {
+    padding-right: 8px;
+  }
+
+  .user-name {
+    display: none;
+  }
+}
+
+/* One stacked block per entry instead of a wide table row */
+@media (max-width: 760px) {
+  .list-header input {
+    width: 100%;
+  }
+
+  .entry-list thead {
+    display: none;
+  }
+
+  .entry-list tr {
+    display: block;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .entry-list tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .entry-list td,
+  .entry-list td:first-child,
+  .entry-list td:last-child {
+    display: block;
+    padding: 2px var(--card-pad);
+    border: none;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .entry-list tr.editing {
+    box-shadow: inset 3px 0 0 var(--brass);
+  }
+
+  .entry-list tr.editing td:first-child {
+    box-shadow: none;
+  }
+
+  /* Four equal buttons, icon above the label, so they fit on one line */
+  .entry-list td.actions {
+    display: flex;
+    gap: 6px;
+    padding-top: 10px;
+  }
+
+  .actions button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 8px 4px 6px;
+    font-size: 0.75rem;
+    color: var(--text);
+    background: var(--raised);
+    border-color: var(--line);
+  }
+
+  .actions .btn-label {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .actions button[data-feedback]::after {
+    display: none;
+  }
+}
+
+/* ---------- Motion ---------- */
+
+/* Smooth colour change when switching themes. */
+body,
+.topbar,
+.user-menu-panel,
+.entry-form,
+.auth-card,
+section,
+input,
+button,
+.entry-list tr,
+.entry-list th,
+.entry-list td {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  button:active {
+    transform: none;
+  }
+}
